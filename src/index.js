@@ -9,7 +9,10 @@ import {
 } from 'locales';
 import { ROUTER } from 'utils/constants';
 import { getStyle } from 'utils/params';
+import { installErrorReporting } from 'utils/errorReporting';
 import './index.scss';
+
+installErrorReporting();
 
 const locale = getLocale();
 const style = getStyle();
