@@ -19,6 +19,7 @@ import {
 import progress from 'utils/progress';
 import storage from 'utils/data/storage';
 import player from 'utils/player';
+import telemetry from 'utils/telemetry';
 import './index.scss';
 
 const intlMessages = defineMessages({
@@ -110,6 +111,8 @@ const Webcams = () => {
 
       player.webcams = videojs(video, buildOptions(sources, tracks), () => {
         const recordId = storage.metadata.id;
+        telemetry.watch(player.webcams);
+        telemetry.open();
 
         player.webcams.on('play', () => {
           if (interval.current) clearInterval(interval.current);
@@ -145,10 +148,12 @@ const Webcams = () => {
           const duration = player.webcams.duration();
           const urlTime = getTime();
           if (urlTime !== null && urlTime < duration) {
+            telemetry.jump('link');
             player.webcams.currentTime(urlTime);
           } else {
             const savedTime = progress.load(recordId);
             if (savedTime && savedTime < duration) {
+              telemetry.jump('resume');
               player.webcams.currentTime(savedTime);
             }
           }

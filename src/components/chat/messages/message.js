@@ -4,6 +4,7 @@ import cx from 'classnames';
 import Info from './info';
 import Margin from './margin';
 import player from 'utils/player';
+import telemetry from 'utils/telemetry';
 import './index.scss';
 import Reply from './reply';
 import ChatMessageReactions from './reactions';
@@ -49,6 +50,7 @@ const Message = ({
   timestamp,
 }) => {
   const handleOnClick = () => {
+    telemetry.jump('chat');
     player.primary.currentTime(timestamp);
   };
 

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import cx from 'classnames';
 import {
   defineMessages,
@@ -19,6 +19,7 @@ import {
 import { ID } from 'utils/constants';
 import layout from 'utils/layout';
 import Shortcuts from 'utils/shortcuts';
+import telemetry from 'utils/telemetry';
 import { useLayoutSwap } from 'components/utils/hooks';
 import './index.scss';
 
@@ -27,6 +28,12 @@ const intlMessages = defineMessages({
     id: 'player.wrapper.aria',
     description: 'Aria label for the player wrapper',
   },
+});
+
+const toggle = (setter, name, key) => () => setter(prev => {
+  telemetry.track(name, 'layout', { [key]: !prev });
+
+  return !prev;
 });
 
 const Player = () => {
@@ -39,6 +46,12 @@ const Player = () => {
   const [swap, setSwap] = useState(layout.swap);
 
   const shortcuts = useRef();
+
+  const toggles = useMemo(() => ({
+    fullscreen: toggle(setFullscreen, 'fullscreen', 'layout.fullscreen'),
+    section: toggle(setSection, 'toggle section', 'layout.section'),
+    swap: toggle(setSwap, 'swap layout', 'layout.swapped'),
+  }), []);
 
   const { showPresentation } = useLayoutSwap();
   const hidePresentation = showPresentation === false;
@@ -55,9 +68,9 @@ const Player = () => {
     const { seconds } = config.seek;
 
     const actions = {
-      fullscreen: () => setFullscreen(prevFullscreen => !prevFullscreen),
+      fullscreen: toggles.fullscreen,
       play: () => play(),
-      section: () => setSection(prevSection => !prevSection),
+      section: toggles.section,
       seek: {
         backward: () => seek(-seconds),
         forward: () => seek(+seconds),
@@ -66,7 +79,7 @@ const Player = () => {
         next: () => skip(+1),
         previous: () => skip(-1),
       },
-      swap: () => setSwap(prevSwap => !prevSwap),
+      swap: toggles.swap,
     };
 
     shortcuts.current = new Shortcuts(actions);
@@ -74,7 +87,7 @@ const Player = () => {
     return () => {
       if (shortcuts.current) shortcuts.current.destroy();
     };
-  }, []);
+  }, [toggles]);
 
   const style = {
     'fullscreen-content': fullscreen,
@@ -91,14 +104,14 @@ const Player = () => {
       <TopBar
         openModal={(type) => setModal(type)}
         section={section}
-        toggleSection={() => setSection(prevSection => !prevSection)}
-        toggleSwap={() => setSwap(prevSwap => !prevSwap)}
+        toggleSection={toggles.section}
+        toggleSwap={toggles.swap}
         hidePresentation={hidePresentation}
       />
       <Media
         fullscreen={fullscreen}
         swap={swap}
-        toggleFullscreen={() => setFullscreen(prevFullscreen => !prevFullscreen)}
+        toggleFullscreen={toggles.fullscreen}
         hidePresentation={hidePresentation}
       />
       <Application />
@@ -107,7 +120,7 @@ const Player = () => {
         handleSearch={(value) => setSearch(value)}
         search={search}
         swap={swap}
-        toggleFullscreen={() => setFullscreen(prevFullscreen => !prevFullscreen)}
+        toggleFullscreen={toggles.fullscreen}
         hidePresentation={hidePresentation}
       />
       <BottomBar />

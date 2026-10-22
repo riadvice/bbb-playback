@@ -113,6 +113,9 @@ When no URL is provided, the dev server starts normally without any proxy.
   - `url`: styles host
   - `valid`: valid style names
 
+- telemetry: viewer actions sent as OpenTelemetry spans when the server traces viewers
+  - `url`: OTLP/JSON endpoint base [`/api/telemetry/playback`]
+
 - thumbnails:
   - `scroll`: automatic scroll [`true`|`false`]
   - `align`: scroll align [`left`|`center`|`right`]

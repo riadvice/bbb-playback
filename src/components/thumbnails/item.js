@@ -4,6 +4,7 @@ import cx from 'classnames';
 import Thumbnail from './thumbnail';
 import { handleOnEnterPress } from 'utils/data/handlers';
 import player from 'utils/player';
+import telemetry from 'utils/telemetry';
 import './index.scss';
 
 const propTypes = {
@@ -46,7 +47,10 @@ const Item = ({
   }
 
   const handleOnClick = () => {
-    if (interactive) player.primary.currentTime(item.timestamp);
+    if (!interactive) return;
+
+    telemetry.jump('thumbnail');
+    player.primary.currentTime(item.timestamp);
   };
 
   return (

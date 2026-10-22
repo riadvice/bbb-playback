@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
 import {
   defineMessages,
@@ -9,6 +9,7 @@ import Question from './question';
 import Result from './result';
 import SystemMessage from 'components/chat/messages/system/message';
 import { ID } from 'utils/constants';
+import telemetry from 'utils/telemetry';
 import './index.scss';
 
 const intlMessages = defineMessages({
@@ -55,6 +56,14 @@ const Poll = ({
   showCorrectAnswer,
 }) => {
   const intl = useIntl();
+
+  useEffect(() => {
+    if (active) telemetry.reach('see poll results', `poll-${timestamp}`, {
+      'poll.at': timestamp,
+      'poll.type': type,
+      'poll.quiz': isQuiz,
+    });
+  }, [active]);
 
   return (
     <SystemMessage

@@ -1,6 +1,7 @@
 import { getCurrentDataIndex } from 'utils/data';
 import storage from 'utils/data/storage';
 import player from 'utils/player';
+import telemetry from 'utils/telemetry';
 
 const play = () => {
   if (player.primary.paused()) {
@@ -36,6 +37,7 @@ const seek = (seconds) => {
   const min = 0;
   const max = player.primary.duration();
   const time = player.primary.currentTime() + seconds;
+  telemetry.jump('shortcut');
 
   if (time < min) {
     player.primary.currentTime(min);
@@ -66,6 +68,7 @@ const skip = (change) => {
   }
 
   if (typeof timestamp !== 'undefined') {
+    telemetry.jump('slide');
     player.primary.currentTime(timestamp);
   }
 };

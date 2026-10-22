@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
 import {
   defineMessages,
@@ -7,6 +7,8 @@ import {
 import Url from './url';
 import SystemMessage from 'components/chat/messages/system/message';
 import { ID } from 'utils/constants';
+import telemetry from 'utils/telemetry';
+import { domain } from './url';
 
 const intlMessages = defineMessages({
   name: {
@@ -33,6 +35,13 @@ const Video = ({
   timestamp,
 }) => {
   const intl = useIntl();
+
+  useEffect(() => {
+    if (active) telemetry.reach('see video link', `video-${timestamp}`, {
+      'video.at': timestamp,
+      'video.domain': domain(url),
+    });
+  }, [active]);
 
   return (
     <SystemMessage

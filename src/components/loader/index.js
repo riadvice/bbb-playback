@@ -15,6 +15,7 @@ import {
 import storage from 'utils/data/storage';
 import layout from 'utils/layout';
 import logger from 'utils/logger';
+import telemetry from 'utils/telemetry';
 import {
   getLayout,
   parseRecordId,
@@ -44,8 +45,11 @@ const Loader = ({ match }) => {
 
   if (error) return <Error code={error} />;
 
+  telemetry.init(recordId.current);
+
   const onError = (error) => {
     logger.error('loader', 'error', error);
+    telemetry.open(error);
     setError(error);
   };
 

@@ -72,6 +72,8 @@ const styles = {
   valid: [],
 };
 
+const telemetry = { url: '/api/telemetry/playback' };
+
 const thumbnails = {
   align: 'center',
   scroll: true,
@@ -88,5 +90,6 @@ export {
   search,
   shortcuts,
   styles,
+  telemetry,
   thumbnails,
 };

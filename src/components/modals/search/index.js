@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import Body from './body';
 import Footer from './footer';
@@ -7,6 +7,7 @@ import { search as config } from 'config';
 import Modal from 'components/utils/modal';
 import { search as getSearch } from 'utils/actions';
 import storage from 'utils/data/storage';
+import telemetry from 'utils/telemetry';
 import {
   isEmpty,
   isEqual,
@@ -43,9 +44,11 @@ const Search = ({
 }) => {
   const [disabled, setDisabled] = useState(true);
   const [search, setSearch] = useState([]);
+  const length = useRef(0);
 
   const handleOnChange = (event) => {
     const value = getValue(event);
+    length.current = value ? value.length : 0;
     if (isValid(value)) {
       const result = getSearch(value, storage.thumbnails);
 
@@ -68,6 +71,7 @@ const Search = ({
   };
 
   const handleOnClick = () => {
+    telemetry.track('search', 'search', { 'search.query_length': length.current, 'search.results': search.length });
     handleSearch(search);
     handleClose();
   };
